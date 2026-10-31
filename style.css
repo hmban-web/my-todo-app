@@ -1,0 +1,636 @@
+/* =========================================================
+   디자인 변수 (색상·그림자·모서리) — 다크 모드에서 값만 바뀜
+   ========================================================= */
+:root {
+  /* 배경 */
+  --bg: #f4f2fb;
+  --aurora-1: rgba(167, 139, 250, 0.55);  /* 보라 */
+  --aurora-2: rgba(96, 165, 250, 0.45);   /* 하늘 */
+  --aurora-3: rgba(244, 114, 182, 0.35);  /* 핑크 */
+
+  /* 유리 카드 */
+  --card-bg: rgba(255, 255, 255, 0.62);
+  --card-border: rgba(255, 255, 255, 0.85);
+  --card-shadow:
+    0 1px 2px rgba(30, 20, 60, 0.04),
+    0 12px 40px -8px rgba(60, 40, 120, 0.18);
+
+  /* 글자 */
+  --text: #17142a;
+  --text-sub: #6b6880;
+  --text-faint: #a5a2b8;
+
+  /* 표면 (입력창, 항목 등) */
+  --surface: rgba(255, 255, 255, 0.7);
+  --surface-hover: rgba(255, 255, 255, 0.95);
+  --surface-border: rgba(23, 20, 42, 0.06);
+  --track: rgba(23, 20, 42, 0.06);
+
+  /* 강조색 */
+  --accent: #7c5cff;
+  --accent-2: #c25cff;
+  --accent-soft: rgba(124, 92, 255, 0.12);
+  --accent-gradient: linear-gradient(135deg, #7c5cff 0%, #c25cff 100%);
+  --danger: #f0446b;
+  --danger-soft: rgba(240, 68, 107, 0.1);
+
+  --radius-lg: 28px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* 시스템이 다크 모드면 자동으로 어두운 테마 적용 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0c0a16;
+    --aurora-1: rgba(124, 92, 255, 0.4);
+    --aurora-2: rgba(56, 120, 255, 0.25);
+    --aurora-3: rgba(214, 70, 160, 0.25);
+
+    --card-bg: rgba(28, 24, 46, 0.55);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.3),
+      0 20px 50px -10px rgba(0, 0, 0, 0.6);
+
+    --text: #f3f1ff;
+    --text-sub: #a19dba;
+    --text-faint: #625e7a;
+
+    --surface: rgba(255, 255, 255, 0.04);
+    --surface-hover: rgba(255, 255, 255, 0.08);
+    --surface-border: rgba(255, 255, 255, 0.06);
+    --track: rgba(255, 255, 255, 0.08);
+
+    --accent-soft: rgba(124, 92, 255, 0.2);
+    --danger-soft: rgba(240, 68, 107, 0.15);
+  }
+}
+
+/* =========================================================
+   기본 설정
+   ========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 72px 16px;
+  font-family: "Pretendard Variable", Pretendard, system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  letter-spacing: -0.01em;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 오로라 배경: 흐릿한 색 덩어리 3개를 화면 뒤에 고정 */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20%;
+  z-index: -2;
+  background:
+    radial-gradient(40% 35% at 20% 15%, var(--aurora-1), transparent 70%),
+    radial-gradient(35% 40% at 85% 25%, var(--aurora-2), transparent 70%),
+    radial-gradient(45% 40% at 60% 90%, var(--aurora-3), transparent 70%);
+  filter: blur(40px);
+  animation: aurora 24s ease-in-out infinite alternate;
+}
+
+/* 아주 옅은 노이즈 질감 (평평한 그라데이션에 깊이감) */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  opacity: 0.05;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 오로라가 천천히 움직이는 애니메이션 */
+@keyframes aurora {
+  from { transform: translate3d(0, 0, 0) rotate(0deg); }
+  to   { transform: translate3d(3%, -2%, 0) rotate(8deg); }
+}
+
+/* 움직임 줄이기 설정을 켠 사용자에게는 애니메이션 끄기 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* 카드들을 세로로 쌓는 컨테이너: 최대 너비 500px */
+.app {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* =========================================================
+   유리(glass) 카드
+   ========================================================= */
+.todo-card {
+  width: 100%;
+  padding: 32px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+/* =========================================================
+   헤더: 날짜 + 제목 + 진행률
+   ========================================================= */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+/* 제목 위 작은 날짜 */
+.eyebrow {
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* 큰 제목 */
+.title {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+/* 진행률 숫자 */
+.progress-text {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* 진행률 바 */
+.progress {
+  height: 6px;
+  margin-bottom: 24px;
+  background: var(--track);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  width: 0;
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: inherit;
+  transition: width 0.6s var(--ease);
+}
+
+/* =========================================================
+   입력 영역
+   ========================================================= */
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.todo-input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.todo-input::placeholder {
+  color: var(--text-faint);
+}
+
+/* 포커스 시 강조색 테두리 + 은은한 빛 */
+.todo-input:focus {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* 추가 버튼: 그라데이션 + 빛나는 그림자 */
+.add-btn {
+  flex-shrink: 0;
+  height: 52px;
+  padding: 0 24px;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: 0 8px 20px -6px rgba(124, 92, 255, 0.6);
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), filter 0.2s;
+}
+
+.add-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 12px 26px -6px rgba(124, 92, 255, 0.7);
+}
+
+.add-btn:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* 키보드 포커스 표시 (공통) */
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   필터 (세그먼트 컨트롤)
+   ========================================================= */
+.filters {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  padding: 4px;
+  background: var(--track);
+  border-radius: 14px;
+}
+
+.filter-btn {
+  flex: 1;
+  height: 36px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-sub);
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.filter-btn:hover {
+  color: var(--text);
+}
+
+/* 현재 선택된 필터 강조 */
+.filter-btn.active {
+  color: var(--text);
+  background: var(--surface-hover);
+  box-shadow: 0 1px 3px rgba(23, 20, 42, 0.1), 0 0 0 1px var(--surface-border);
+}
+
+/* =========================================================
+   할 일 목록
+   ========================================================= */
+.todo-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 목록이 비어 있을 때 안내 문구 (문구는 data-empty 속성에서 가져옴) */
+.todo-list:empty::after {
+  content: attr(data-empty);
+  display: block;
+  padding: 36px 0;
+  font-size: 14px;
+  color: var(--text-faint);
+  text-align: center;
+  border: 1.5px dashed var(--surface-border);
+  border-radius: var(--radius-md);
+}
+
+/* 할 일 항목 한 줄 */
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 14px 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-md);
+  transition: background 0.2s, transform 0.2s var(--ease), box-shadow 0.2s;
+}
+
+.todo-item:hover {
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -8px rgba(60, 40, 120, 0.25);
+}
+
+/* 원형 커스텀 체크박스 */
+.todo-check {
+  flex-shrink: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--text-faint);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s var(--ease);
+}
+
+.todo-check:hover {
+  border-color: var(--accent);
+}
+
+/* 체크 표시(✓) 모양: 회전한 테두리로 그림 */
+.todo-check::after {
+  content: "";
+  width: 5px;
+  height: 10px;
+  margin-top: -2px;
+  border: solid #ffffff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  transition: transform 0.2s var(--ease);
+}
+
+.todo-check:checked {
+  background: var(--accent-gradient);
+  border-color: transparent;
+}
+
+.todo-check:checked::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.todo-check:active {
+  transform: scale(0.88);
+}
+
+.todo-check:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* 할 일 내용 */
+.todo-text {
+  flex: 1;
+  font-size: 15.5px;
+  font-weight: 500;
+  word-break: break-all;
+  transition: color 0.2s;
+}
+
+/* 완료된 항목: 취소선 + 흐리게 */
+.todo-item.completed .todo-text {
+  color: var(--text-faint);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+}
+
+/* 삭제(×) 버튼: 평소엔 흐리게, 항목에 마우스를 올리면 또렷하게 */
+.delete-btn {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-faint);
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: color 0.2s, background 0.2s, opacity 0.2s;
+}
+
+.todo-item:hover .delete-btn,
+.delete-btn:focus-visible {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+/* =========================================================
+   하단: 개수 + 보관 버튼
+   ========================================================= */
+.todo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--surface-border);
+}
+
+.todo-count {
+  font-size: 13.5px;
+  color: var(--text-sub);
+}
+
+.todo-count strong {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-count .divider {
+  margin: 0 6px;
+  color: var(--text-faint);
+}
+
+/* 작은 알약(pill) 모양 버튼 공통 */
+.footer-btn {
+  flex-shrink: 0;
+  height: 34px;
+  padding: 0 16px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s var(--ease);
+}
+
+.footer-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+/* 완료 항목 보관 버튼 */
+.archive-btn {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.archive-btn:hover:not(:disabled) {
+  background: rgba(124, 92, 255, 0.2);
+}
+
+/* 보관함 비우기 버튼 (영구 삭제) */
+.danger-btn {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.danger-btn:hover:not(:disabled) {
+  background: rgba(240, 68, 107, 0.18);
+}
+
+/* 해당 항목이 없을 때 비활성 상태 */
+.footer-btn:disabled {
+  color: var(--text-faint);
+  background: var(--track);
+  cursor: not-allowed;
+}
+
+/* =========================================================
+   보관함 카드
+   ========================================================= */
+.archive-card {
+  padding-top: 26px;
+}
+
+.archive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.archive-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+/* 보관된 항목 개수 배지 */
+.badge {
+  min-width: 24px;
+  padding: 2px 9px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: center;
+  background: var(--accent-soft);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 보관된 항목: 완료된 느낌으로 흐리게 */
+.archive-item .todo-text {
+  color: var(--text-sub);
+  text-decoration: line-through;
+  text-decoration-color: var(--text-faint);
+}
+
+/* 완료 표시 아이콘 */
+.archive-mark {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border-radius: 50%;
+}
+
+/* 내용 + 보관 시각 */
+.archive-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.archive-date {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 복원 버튼 */
+.restore-btn {
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 14px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s var(--ease);
+}
+
+.restore-btn:hover {
+  background: rgba(124, 92, 255, 0.22);
+}
+
+.restore-btn:active {
+  transform: scale(0.95);
+}
+
+/* =========================================================
+   좁은 화면(모바일) 대응
+   ========================================================= */
+@media (max-width: 480px) {
+  body {
+    padding: 32px 12px;
+  }
+
+  .todo-card {
+    padding: 24px 20px;
+    border-radius: 24px;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}

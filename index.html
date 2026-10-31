@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>나의 할 일 목록</title>
+  <!-- Pretendard 폰트 (인터넷 연결이 없으면 시스템 폰트로 대체됨) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <!-- ===== 할 일 카드 ===== -->
+    <section class="todo-card">
+      <!-- 헤더: 오늘 날짜 + 제목 + 진행률 -->
+      <header class="card-header">
+        <div>
+          <p id="today" class="eyebrow"></p>
+          <h1 class="title">나의 할 일 목록</h1>
+        </div>
+        <span id="progress-text" class="progress-text">0%</span>
+      </header>
+
+      <!-- 진행률 바 (완료 비율만큼 채워짐) -->
+      <div class="progress" aria-hidden="true">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+
+      <!-- 할 일 입력 영역 -->
+      <div class="input-row">
+        <input
+          type="text"
+          id="todo-input"
+          class="todo-input"
+          placeholder="할 일을 입력하세요"
+          aria-label="할 일 입력"
+        >
+        <button type="button" id="add-btn" class="add-btn">추가</button>
+      </div>
+
+      <!-- 필터 버튼: 선택된 버튼에 "active" 클래스가 붙음 -->
+      <div class="filters" role="group" aria-label="할 일 필터">
+        <button type="button" class="filter-btn active" data-filter="all" aria-pressed="true">전체</button>
+        <button type="button" class="filter-btn" data-filter="active" aria-pressed="false">진행중</button>
+        <button type="button" class="filter-btn" data-filter="completed" aria-pressed="false">완료</button>
+      </div>
+
+      <!--
+        할 일 목록 (항목은 JS가 아래 구조로 생성)
+        <li class="todo-item">            ← 완료 시 "completed" 클래스 추가
+          <input type="checkbox" class="todo-check">
+          <span class="todo-text">할 일 내용</span>
+          <button type="button" class="delete-btn" aria-label="삭제">×</button>
+        </li>
+        data-empty: 목록이 비었을 때 표시할 안내 문구 (필터에 따라 JS가 변경)
+      -->
+      <ul id="todo-list" class="todo-list" data-empty="아직 할 일이 없습니다."></ul>
+
+      <!-- 하단: 할 일 개수 + 완료 항목 보관 -->
+      <div class="todo-footer">
+        <p class="todo-count">
+          전체 <strong id="total-count">0</strong>개
+          <span class="divider">·</span>
+          완료 <strong id="done-count">0</strong>개
+        </p>
+        <button type="button" id="archive-completed-btn" class="footer-btn archive-btn" disabled>
+          완료 항목 보관
+        </button>
+      </div>
+    </section>
+
+    <!-- ===== 보관함 카드: 정리된 완료 항목 ===== -->
+    <section class="todo-card archive-card">
+      <div class="archive-header">
+        <h2 class="archive-title">
+          보관함 <span id="archive-count" class="badge">0</span>
+        </h2>
+        <button type="button" id="clear-archive-btn" class="footer-btn danger-btn" disabled>
+          보관함 비우기
+        </button>
+      </div>
+
+      <!-- 보관된 항목 목록 (항목마다 복원 / 영구 삭제 버튼) -->
+      <ul id="archive-list" class="todo-list" data-empty="보관된 항목이 없습니다."></ul>
+    </section>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>
